@@ -3,6 +3,13 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+java {
+    // Toolchain resmi: paksa semua task Java di modul ini pakai JDK 17
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 android {
     namespace "com.jhomlala.better_player"
     compileSdkVersion 35
@@ -12,6 +19,7 @@ android {
         targetSdkVersion 35
     }
 
+    // Pastikan AGP set ke Java 17
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -26,15 +34,24 @@ android {
     }
 }
 
+// Fallback terakhir: kalau masih ada task yang ngeyel ke 1.8, paksa di sini
+tasks.withType(org.gradle.api.tasks.compile.JavaCompile).configureEach {
+    sourceCompatibility = JavaVersion.VERSION_17.toString()
+    targetCompatibility = JavaVersion.VERSION_17.toString()
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions { jvmTarget = '17' }
+}
+
 dependencies {
-    // Kotlin stdlib akan ditarik otomatis dari plugin Kotlin, tapi boleh dibiarkan kosong.
-    // implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation "com.google.android.exoplayer:exoplayer-core:2.17.1"
     implementation "com.google.android.exoplayer:exoplayer-hls:2.17.1"
     implementation "com.google.android.exoplayer:exoplayer-dash:2.17.1"
     implementation "com.google.android.exoplayer:exoplayer-smoothstreaming:2.17.1"
     implementation "com.google.android.exoplayer:exoplayer-ui:2.17.1"
     implementation "com.google.android.exoplayer:extension-mediasession:2.17.1"
+
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.0-beta01"
     implementation "androidx.lifecycle:lifecycle-common:2.4.0-beta01"
     implementation "androidx.lifecycle:lifecycle-common-java8:2.4.0-beta01"
